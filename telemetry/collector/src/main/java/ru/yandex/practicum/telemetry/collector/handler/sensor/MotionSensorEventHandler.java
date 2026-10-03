@@ -1,13 +1,13 @@
 package ru.yandex.practicum.telemetry.collector.handler.sensor;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.kafka.telemetry.event.MotionSensorAvro;
+import ru.yandex.practicum.telemetry.collector.dto.sensor.MotionSensorEventRequest;
 import ru.yandex.practicum.telemetry.collector.dto.sensor.SensorEventRequest;
 import ru.yandex.practicum.telemetry.collector.dto.sensor.SensorEventType;
 
-@Slf4j
 @Component
-public class MotionSensorEventHandler implements SensorEventHandler {
+public class MotionSensorEventHandler extends BaseSensorEventHandler<MotionSensorAvro> {
 
     @Override
     public SensorEventType getMessageType() {
@@ -15,7 +15,12 @@ public class MotionSensorEventHandler implements SensorEventHandler {
     }
 
     @Override
-    public void handle(SensorEventRequest event) {
-        log.info("Получено событие датчика {}: {}", getMessageType(), event);
+    protected MotionSensorAvro mapToAvro(SensorEventRequest event) {
+        MotionSensorEventRequest motionEvent = (MotionSensorEventRequest) event;
+        return MotionSensorAvro.newBuilder()
+                .setLinkQuality(motionEvent.getLinkQuality())
+                .setMotion(motionEvent.getMotion())
+                .setVoltage(motionEvent.getVoltage())
+                .build();
     }
 }

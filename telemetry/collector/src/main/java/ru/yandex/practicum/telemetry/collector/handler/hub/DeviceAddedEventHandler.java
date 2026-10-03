@@ -1,13 +1,14 @@
 package ru.yandex.practicum.telemetry.collector.handler.hub;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.kafka.telemetry.event.DeviceAddedEventAvro;
+import ru.yandex.practicum.kafka.telemetry.event.DeviceTypeAvro;
+import ru.yandex.practicum.telemetry.collector.dto.hub.DeviceAddedEventRequest;
 import ru.yandex.practicum.telemetry.collector.dto.hub.HubEventRequest;
 import ru.yandex.practicum.telemetry.collector.dto.hub.HubEventType;
 
-@Slf4j
 @Component
-public class DeviceAddedEventHandler implements HubEventHandler {
+public class DeviceAddedEventHandler extends BaseHubEventHandler<DeviceAddedEventAvro> {
 
     @Override
     public HubEventType getMessageType() {
@@ -15,7 +16,11 @@ public class DeviceAddedEventHandler implements HubEventHandler {
     }
 
     @Override
-    public void handle(HubEventRequest event) {
-        log.info("Получено событие хаба {}: {}", getMessageType(), event);
+    protected DeviceAddedEventAvro mapToAvro(HubEventRequest event) {
+        DeviceAddedEventRequest deviceAddedEvent = (DeviceAddedEventRequest) event;
+        return DeviceAddedEventAvro.newBuilder()
+                .setId(deviceAddedEvent.getId())
+                .setType(DeviceTypeAvro.valueOf(deviceAddedEvent.getDeviceType().name()))
+                .build();
     }
 }

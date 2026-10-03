@@ -1,13 +1,15 @@
 package ru.yandex.practicum.telemetry.collector.handler.sensor;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.kafka.telemetry.event.LightSensorAvro;
+import ru.yandex.practicum.telemetry.collector.dto.sensor.LightSensorEventRequest;
 import ru.yandex.practicum.telemetry.collector.dto.sensor.SensorEventRequest;
 import ru.yandex.practicum.telemetry.collector.dto.sensor.SensorEventType;
 
-@Slf4j
+import java.util.Objects;
+
 @Component
-public class LightSensorEventHandler implements SensorEventHandler {
+public class LightSensorEventHandler extends BaseSensorEventHandler<LightSensorAvro> {
 
     @Override
     public SensorEventType getMessageType() {
@@ -15,7 +17,11 @@ public class LightSensorEventHandler implements SensorEventHandler {
     }
 
     @Override
-    public void handle(SensorEventRequest event) {
-        log.info("Получено событие датчика {}: {}", getMessageType(), event);
+    protected LightSensorAvro mapToAvro(SensorEventRequest event) {
+        LightSensorEventRequest lightEvent = (LightSensorEventRequest) event;
+        return LightSensorAvro.newBuilder()
+                .setLinkQuality(Objects.requireNonNullElse(lightEvent.getLinkQuality(), 0))
+                .setLuminosity(Objects.requireNonNullElse(lightEvent.getLuminosity(), 0))
+                .build();
     }
 }

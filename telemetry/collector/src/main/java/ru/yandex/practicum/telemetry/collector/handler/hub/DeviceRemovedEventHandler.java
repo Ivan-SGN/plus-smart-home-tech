@@ -1,13 +1,13 @@
 package ru.yandex.practicum.telemetry.collector.handler.hub;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.kafka.telemetry.event.DeviceRemovedEventAvro;
+import ru.yandex.practicum.telemetry.collector.dto.hub.DeviceRemovedEventRequest;
 import ru.yandex.practicum.telemetry.collector.dto.hub.HubEventRequest;
 import ru.yandex.practicum.telemetry.collector.dto.hub.HubEventType;
 
-@Slf4j
 @Component
-public class DeviceRemovedEventHandler implements HubEventHandler {
+public class DeviceRemovedEventHandler extends BaseHubEventHandler<DeviceRemovedEventAvro> {
 
     @Override
     public HubEventType getMessageType() {
@@ -15,7 +15,10 @@ public class DeviceRemovedEventHandler implements HubEventHandler {
     }
 
     @Override
-    public void handle(HubEventRequest event) {
-        log.info("Получено событие хаба {}: {}", getMessageType(), event);
+    protected DeviceRemovedEventAvro mapToAvro(HubEventRequest event) {
+        DeviceRemovedEventRequest deviceRemovedEvent = (DeviceRemovedEventRequest) event;
+        return DeviceRemovedEventAvro.newBuilder()
+                .setId(deviceRemovedEvent.getId())
+                .build();
     }
 }

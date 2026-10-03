@@ -2,12 +2,14 @@ package ru.yandex.practicum.telemetry.collector.handler.sensor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.kafka.telemetry.event.SwitchSensorAvro;
 import ru.yandex.practicum.telemetry.collector.dto.sensor.SensorEventRequest;
 import ru.yandex.practicum.telemetry.collector.dto.sensor.SensorEventType;
+import ru.yandex.practicum.telemetry.collector.dto.sensor.SwitchSensorEventRequest;
 
-@Slf4j
+
 @Component
-public class SwitchSensorEventHandler implements SensorEventHandler {
+public class SwitchSensorEventHandler extends BaseSensorEventHandler<SwitchSensorAvro> {
 
     @Override
     public SensorEventType getMessageType() {
@@ -15,7 +17,10 @@ public class SwitchSensorEventHandler implements SensorEventHandler {
     }
 
     @Override
-    public void handle(SensorEventRequest event) {
-        log.info("Получено событие датчика {}: {}", getMessageType(), event);
+    protected SwitchSensorAvro mapToAvro(SensorEventRequest event) {
+        SwitchSensorEventRequest sensorEvent = (SwitchSensorEventRequest) event;
+        return SwitchSensorAvro.newBuilder()
+                .setState(sensorEvent.getState())
+                .build();
     }
 }

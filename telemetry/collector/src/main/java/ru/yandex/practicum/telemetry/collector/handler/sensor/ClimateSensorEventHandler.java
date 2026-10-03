@@ -1,13 +1,13 @@
 package ru.yandex.practicum.telemetry.collector.handler.sensor;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.kafka.telemetry.event.ClimateSensorAvro;
+import ru.yandex.practicum.telemetry.collector.dto.sensor.ClimateSensorEventRequest;
 import ru.yandex.practicum.telemetry.collector.dto.sensor.SensorEventRequest;
 import ru.yandex.practicum.telemetry.collector.dto.sensor.SensorEventType;
 
-@Slf4j
 @Component
-public class ClimateSensorEventHandler implements SensorEventHandler {
+public class ClimateSensorEventHandler extends BaseSensorEventHandler<ClimateSensorAvro> {
 
     @Override
     public SensorEventType getMessageType() {
@@ -15,7 +15,12 @@ public class ClimateSensorEventHandler implements SensorEventHandler {
     }
 
     @Override
-    public void handle(SensorEventRequest event) {
-        log.info("Получено событие датчика {}: {}", getMessageType(), event);
+    protected ClimateSensorAvro mapToAvro(SensorEventRequest event) {
+        ClimateSensorEventRequest climateEvent = (ClimateSensorEventRequest) event;
+        return ClimateSensorAvro.newBuilder()
+                .setTemperatureC(climateEvent.getTemperatureC())
+                .setHumidity(climateEvent.getHumidity())
+                .setCo2Level(climateEvent.getCo2Level())
+                .build();
     }
 }

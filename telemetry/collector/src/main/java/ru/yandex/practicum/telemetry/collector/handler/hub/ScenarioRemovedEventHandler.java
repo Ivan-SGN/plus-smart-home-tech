@@ -1,13 +1,13 @@
 package ru.yandex.practicum.telemetry.collector.handler.hub;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.kafka.telemetry.event.ScenarioRemovedEventAvro;
 import ru.yandex.practicum.telemetry.collector.dto.hub.HubEventRequest;
 import ru.yandex.practicum.telemetry.collector.dto.hub.HubEventType;
+import ru.yandex.practicum.telemetry.collector.dto.hub.ScenarioRemovedEventRequest;
 
-@Slf4j
 @Component
-public class ScenarioRemovedEventHandler implements HubEventHandler {
+public class ScenarioRemovedEventHandler extends BaseHubEventHandler<ScenarioRemovedEventAvro> {
 
     @Override
     public HubEventType getMessageType() {
@@ -15,7 +15,10 @@ public class ScenarioRemovedEventHandler implements HubEventHandler {
     }
 
     @Override
-    public void handle(HubEventRequest event) {
-        log.info("Получено событие хаба {}: {}", getMessageType(), event);
+    protected ScenarioRemovedEventAvro mapToAvro(HubEventRequest event) {
+        ScenarioRemovedEventRequest scenarioRemovedEvent = (ScenarioRemovedEventRequest) event;
+        return ScenarioRemovedEventAvro.newBuilder()
+                .setName(scenarioRemovedEvent.getName())
+                .build();
     }
 }
