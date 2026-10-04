@@ -1,2 +1,16 @@
 server:
   port: 8080
+
+collector:
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      acks: all
+      linger-ms: 1
+      batch-size: 16384
+      max-block-ms: 3000
+      request-timeout-ms: 3000
+      delivery-timeout-ms: 7000
+    topics:
+      sensors: telemetry.sensors.v1
+      hubs: telemetry.hubs.v1

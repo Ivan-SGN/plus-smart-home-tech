@@ -5,11 +5,17 @@ import ru.yandex.practicum.kafka.telemetry.event.LightSensorAvro;
 import ru.yandex.practicum.telemetry.collector.dto.sensor.LightSensorEventRequest;
 import ru.yandex.practicum.telemetry.collector.dto.sensor.SensorEventRequest;
 import ru.yandex.practicum.telemetry.collector.dto.sensor.SensorEventType;
+import ru.yandex.practicum.telemetry.collector.kafka.EventProducer;
+import ru.yandex.practicum.telemetry.collector.kafka.KafkaProperties;
 
 import java.util.Objects;
 
 @Component
 public class LightSensorEventHandler extends BaseSensorEventHandler<LightSensorAvro> {
+
+    public LightSensorEventHandler(EventProducer eventProducer, KafkaProperties kafkaProperties) {
+        super(eventProducer, kafkaProperties);
+    }
 
     @Override
     public SensorEventType getMessageType() {

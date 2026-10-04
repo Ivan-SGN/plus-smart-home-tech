@@ -1,12 +1,20 @@
 package ru.yandex.practicum.telemetry.collector.handler.sensor;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.specific.SpecificRecordBase;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.telemetry.collector.dto.sensor.SensorEventRequest;
+import ru.yandex.practicum.telemetry.collector.kafka.EventProducer;
+import ru.yandex.practicum.telemetry.collector.kafka.KafkaProperties;
 
-@Slf4j
 public abstract class BaseSensorEventHandler<T extends SpecificRecordBase> implements SensorEventHandler {
+
+    private final EventProducer eventProducer;
+    private final String topic;
+
+    protected BaseSensorEventHandler(EventProducer eventProducer, KafkaProperties kafkaProperties) {
+        this.eventProducer = eventProducer;
+        this.topic = kafkaProperties.topics().sensors();
+    }
 
     protected abstract T mapToAvro(SensorEventRequest event);
 
@@ -18,6 +26,6 @@ public abstract class BaseSensorEventHandler<T extends SpecificRecordBase> imple
                 .setTimestamp(event.getTimestamp())
                 .setPayload(mapToAvro(event))
                 .build();
-        log.info("Событие датчика {} преобразовано в Avro: {}", getMessageType(), avro);
+        eventProducer.send(topic, event.getHubId(), avro);
     }
 }

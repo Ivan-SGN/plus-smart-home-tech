@@ -32,6 +32,14 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Некорректное тело запроса");
     }
 
+    @ExceptionHandler(EventSendException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public ErrorResponse handleEventSend(EventSendException e) {
+        log.error("Событие не сохранено в Kafka: {}", e.getMessage(), e);
+        return new ErrorResponse(HttpStatus.SERVICE_UNAVAILABLE.value(),
+                "Не удалось сохранить событие, повторите запрос");
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleGeneral(Exception e) {

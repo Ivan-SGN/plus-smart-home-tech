@@ -12,9 +12,15 @@ import ru.yandex.practicum.telemetry.collector.dto.hub.HubEventRequest;
 import ru.yandex.practicum.telemetry.collector.dto.hub.HubEventType;
 import ru.yandex.practicum.telemetry.collector.dto.hub.ScenarioAddedEventRequest;
 import ru.yandex.practicum.telemetry.collector.dto.hub.ScenarioConditionRequest;
+import ru.yandex.practicum.telemetry.collector.kafka.EventProducer;
+import ru.yandex.practicum.telemetry.collector.kafka.KafkaProperties;
 
 @Component
 public class ScenarioAddedEventHandler extends BaseHubEventHandler<ScenarioAddedEventAvro> {
+
+    public ScenarioAddedEventHandler(EventProducer eventProducer, KafkaProperties kafkaProperties) {
+        super(eventProducer, kafkaProperties);
+    }
 
     @Override
     public HubEventType getMessageType() {

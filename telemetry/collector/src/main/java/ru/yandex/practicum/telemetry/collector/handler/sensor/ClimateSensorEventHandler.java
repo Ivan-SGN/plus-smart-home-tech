@@ -5,9 +5,15 @@ import ru.yandex.practicum.kafka.telemetry.event.ClimateSensorAvro;
 import ru.yandex.practicum.telemetry.collector.dto.sensor.ClimateSensorEventRequest;
 import ru.yandex.practicum.telemetry.collector.dto.sensor.SensorEventRequest;
 import ru.yandex.practicum.telemetry.collector.dto.sensor.SensorEventType;
+import ru.yandex.practicum.telemetry.collector.kafka.EventProducer;
+import ru.yandex.practicum.telemetry.collector.kafka.KafkaProperties;
 
 @Component
 public class ClimateSensorEventHandler extends BaseSensorEventHandler<ClimateSensorAvro> {
+
+    public ClimateSensorEventHandler(EventProducer eventProducer, KafkaProperties kafkaProperties) {
+        super(eventProducer, kafkaProperties);
+    }
 
     @Override
     public SensorEventType getMessageType() {

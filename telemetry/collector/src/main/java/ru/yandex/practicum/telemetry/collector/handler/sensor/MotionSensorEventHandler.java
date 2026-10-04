@@ -5,9 +5,15 @@ import ru.yandex.practicum.kafka.telemetry.event.MotionSensorAvro;
 import ru.yandex.practicum.telemetry.collector.dto.sensor.MotionSensorEventRequest;
 import ru.yandex.practicum.telemetry.collector.dto.sensor.SensorEventRequest;
 import ru.yandex.practicum.telemetry.collector.dto.sensor.SensorEventType;
+import ru.yandex.practicum.telemetry.collector.kafka.EventProducer;
+import ru.yandex.practicum.telemetry.collector.kafka.KafkaProperties;
 
 @Component
 public class MotionSensorEventHandler extends BaseSensorEventHandler<MotionSensorAvro> {
+
+    public MotionSensorEventHandler(EventProducer eventProducer, KafkaProperties kafkaProperties) {
+        super(eventProducer, kafkaProperties);
+    }
 
     @Override
     public SensorEventType getMessageType() {
