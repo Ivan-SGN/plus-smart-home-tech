@@ -16,7 +16,7 @@ import java.util.Properties;
 @EnableConfigurationProperties(KafkaProperties.class)
 public class KafkaClientConfiguration {
 
-    @Bean(destroyMethod = "close")
+    @Bean(destroyMethod = "")
     public Producer<String, SpecificRecordBase> kafkaProducer(KafkaProperties properties) {
         KafkaProperties.ProducerSettings settings = properties.producer();
 
