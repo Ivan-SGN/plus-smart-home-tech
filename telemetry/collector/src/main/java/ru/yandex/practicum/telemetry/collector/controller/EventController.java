@@ -1,31 +1,45 @@
 package ru.yandex.practicum.telemetry.collector.controller;
 
-import jakarta.validation.Valid;
+import com.google.protobuf.Empty;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
+import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.telemetry.collector.dto.hub.HubEventRequest;
-import ru.yandex.practicum.telemetry.collector.dto.sensor.SensorEventRequest;
+import net.devh.boot.grpc.server.service.GrpcService;
+import ru.yandex.practicum.grpc.telemetry.collector.CollectorControllerGrpc;
+import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
+import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 import ru.yandex.practicum.telemetry.collector.service.HubEventService;
 import ru.yandex.practicum.telemetry.collector.service.SensorEventService;
 
-@RestController
-@RequestMapping("/events")
+@GrpcService
 @RequiredArgsConstructor
-public class EventController {
+public class EventController extends CollectorControllerGrpc.CollectorControllerImplBase {
 
     private final SensorEventService sensorEventService;
     private final HubEventService hubEventService;
 
-    @PostMapping("/sensors")
-    public void collectSensorEvent(@Valid @RequestBody SensorEventRequest event) {
-        sensorEventService.collect(event);
+    @Override
+    public void collectSensorEvent(SensorEventProto request, StreamObserver<Empty> responseObserver) {
+        try {
+            sensorEventService.collect(request);
+            responseObserver.onNext(Empty.getDefaultInstance());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(new StatusRuntimeException(
+                    Status.INTERNAL.withDescription(e.getLocalizedMessage()).withCause(e)));
+        }
     }
 
-    @PostMapping("/hubs")
-    public void collectHubEvent(@Valid @RequestBody HubEventRequest event) {
-        hubEventService.collect(event);
+    @Override
+    public void collectHubEvent(HubEventProto request, StreamObserver<Empty> responseObserver) {
+        try {
+            hubEventService.collect(request);
+            responseObserver.onNext(Empty.getDefaultInstance());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(new StatusRuntimeException(
+                    Status.INTERNAL.withDescription(e.getLocalizedMessage()).withCause(e)));
+        }
     }
 }
