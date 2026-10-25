@@ -1,14 +1,11 @@
 package ru.yandex.practicum.telemetry.collector.handler.sensor;
 
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.grpc.telemetry.event.LightSensorProto;
+import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 import ru.yandex.practicum.kafka.telemetry.event.LightSensorAvro;
-import ru.yandex.practicum.telemetry.collector.dto.sensor.LightSensorEventRequest;
-import ru.yandex.practicum.telemetry.collector.dto.sensor.SensorEventRequest;
-import ru.yandex.practicum.telemetry.collector.dto.sensor.SensorEventType;
 import ru.yandex.practicum.telemetry.collector.kafka.EventProducer;
 import ru.yandex.practicum.telemetry.collector.kafka.KafkaProperties;
-
-import java.util.Objects;
 
 @Component
 public class LightSensorEventHandler extends BaseSensorEventHandler<LightSensorAvro> {
@@ -18,16 +15,16 @@ public class LightSensorEventHandler extends BaseSensorEventHandler<LightSensorA
     }
 
     @Override
-    public SensorEventType getMessageType() {
-        return SensorEventType.LIGHT_SENSOR_EVENT;
+    public SensorEventProto.PayloadCase getMessageType() {
+        return SensorEventProto.PayloadCase.LIGHT_SENSOR;
     }
 
     @Override
-    protected LightSensorAvro mapToAvro(SensorEventRequest event) {
-        LightSensorEventRequest lightEvent = (LightSensorEventRequest) event;
+    protected LightSensorAvro mapToAvro(SensorEventProto event) {
+        LightSensorProto light = event.getLightSensor();
         return LightSensorAvro.newBuilder()
-                .setLinkQuality(Objects.requireNonNullElse(lightEvent.getLinkQuality(), 0))
-                .setLuminosity(Objects.requireNonNullElse(lightEvent.getLuminosity(), 0))
+                .setLinkQuality(light.getLinkQuality())
+                .setLuminosity(light.getLuminosity())
                 .build();
     }
 }
