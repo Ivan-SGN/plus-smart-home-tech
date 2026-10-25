@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.kafka.telemetry.event.DeviceActionAvro;
 import ru.yandex.practicum.kafka.telemetry.event.ScenarioAddedEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.ScenarioConditionAvro;
+import ru.yandex.practicum.telemetry.analyzer.exception.InvalidHubEventException;
 import ru.yandex.practicum.telemetry.analyzer.model.Action;
 import ru.yandex.practicum.telemetry.analyzer.model.ActionType;
 import ru.yandex.practicum.telemetry.analyzer.model.Condition;
@@ -50,9 +51,9 @@ public class ScenarioAddedEventHandler implements HubEventHandler<ScenarioAddedE
                 .collect(Collectors.toMap(Sensor::getId, Function.identity()));
 
         if (sensors.size() != sensorIds.size()) {
-            log.warn("Хаб {}: сценарий '{}' пропущен, не зарегистрированы датчики {}", hubId, payload.getName(),
-                    sensorIds.stream().filter(id -> !sensors.containsKey(id)).toList());
-            return;
+            throw new InvalidHubEventException("Хаб " + hubId + ": сценарий '" + payload.getName()
+                    + "' ссылается на датчики, не зарегистрированные в этом хабе: "
+                    + sensorIds.stream().filter(id -> !sensors.containsKey(id)).toList());
         }
 
         Scenario scenario = scenarioRepository.findByHubIdAndName(hubId, payload.getName())
@@ -98,7 +99,7 @@ public class ScenarioAddedEventHandler implements HubEventHandler<ScenarioAddedE
             case null -> null;
             case Integer number -> number;
             case Boolean flag -> flag ? 1 : 0;
-            default -> throw new IllegalArgumentException("Неподдерживаемое значение условия: " + value);
+            default -> throw new InvalidHubEventException("Неподдерживаемое значение условия: " + value);
         };
     }
 }

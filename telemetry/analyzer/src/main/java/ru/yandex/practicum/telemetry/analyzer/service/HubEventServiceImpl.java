@@ -2,6 +2,7 @@ package ru.yandex.practicum.telemetry.analyzer.service;
 
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
+import ru.yandex.practicum.telemetry.analyzer.exception.InvalidHubEventException;
 import ru.yandex.practicum.telemetry.analyzer.handler.hub.HubEventHandler;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public class HubEventServiceImpl implements HubEventService {
     public void process(HubEventAvro event) {
         HubEventHandler<?> handler = handlers.get(event.getPayload().getClass());
         if (handler == null) {
-            throw new IllegalArgumentException("Нет обработчика для события хаба " + event.getPayload().getClass().getSimpleName());
+            throw new InvalidHubEventException("Нет обработчика для события хаба " + event.getPayload().getClass().getSimpleName());
         }
         handle(handler, event);
     }

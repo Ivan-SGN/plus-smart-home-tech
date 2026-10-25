@@ -27,6 +27,8 @@ grpc:
       negotiationType: plaintext
 
 analyzer:
+  hub-router:
+    deadline-ms: 3000
   kafka:
     bootstrap-servers: localhost:9092
     topics:
