@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: aggregator
+
+logging:
+  register-shutdown-hook: false
+
+aggregator:
+  kafka:
+    bootstrap-servers: localhost:9092
+    topics:
+      sensors: telemetry.sensors.v1
+      snapshots: telemetry.snapshots.v1
+    producer:
+      acks: all
+      linger-ms: 1
+      batch-size: 16384
+      max-block-ms: 3000
+      request-timeout-ms: 3000
+      delivery-timeout-ms: 7000
+    consumer:
+      group-id: telemetry.aggregator
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      poll-timeout-ms: 100

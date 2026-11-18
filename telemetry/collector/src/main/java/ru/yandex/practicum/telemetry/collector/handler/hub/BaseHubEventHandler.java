@@ -1,10 +1,13 @@
 package ru.yandex.practicum.telemetry.collector.handler.hub;
 
+import com.google.protobuf.Timestamp;
 import org.apache.avro.specific.SpecificRecordBase;
+import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
-import ru.yandex.practicum.telemetry.collector.dto.hub.HubEventRequest;
 import ru.yandex.practicum.telemetry.collector.kafka.EventProducer;
 import ru.yandex.practicum.telemetry.collector.kafka.KafkaProperties;
+
+import java.time.Instant;
 
 public abstract class BaseHubEventHandler<T extends SpecificRecordBase> implements HubEventHandler {
 
@@ -16,15 +19,19 @@ public abstract class BaseHubEventHandler<T extends SpecificRecordBase> implemen
         this.topic = kafkaProperties.topics().hubs();
     }
 
-    protected abstract T mapToAvro(HubEventRequest event);
+    protected abstract T mapToAvro(HubEventProto event);
 
     @Override
-    public final void handle(HubEventRequest event) {
+    public final void handle(HubEventProto event) {
         HubEventAvro avro = HubEventAvro.newBuilder()
                 .setHubId(event.getHubId())
-                .setTimestamp(event.getTimestamp())
+                .setTimestamp(toInstant(event.getTimestamp()))
                 .setPayload(mapToAvro(event))
                 .build();
         eventProducer.send(topic, event.getHubId(), avro);
+    }
+
+    private static Instant toInstant(Timestamp ts) {
+        return Instant.ofEpochSecond(ts.getSeconds(), ts.getNanos());
     }
 }
